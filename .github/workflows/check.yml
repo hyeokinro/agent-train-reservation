@@ -1,0 +1,32 @@
+name: Train seat check
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run seat check
+        run: python check_trains.py
+        env:
+          SRT_ID: ${{ secrets.SRT_ID }}
+          SRT_PASSWORD: ${{ secrets.SRT_PASSWORD }}
+          KTX_ID: ${{ secrets.KTX_ID }}
+          KTX_PASSWORD: ${{ secrets.KTX_PASSWORD }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
