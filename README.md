@@ -12,9 +12,9 @@ SRT / KTX 매진 열차를 주기적으로 감시해서, 빈 좌석이 생기면
 2. [텔레그램 봇 만들기](#2-텔레그램-봇-만들기)
 3. [GitHub Secrets 설정](#3-github-secrets-설정)
 4. [로컬 테스트](#4-로컬-테스트)
-5. [config.json 수정법](#5-configjson-수정법)
-6. [SRT vs KTX 차이점](#6-srt-vs-ktx-차이점)
-7. [GitHub Actions cron 한계](#7-github-actions-cron-한계)
+5. [Cloudflare Workers cron 배포](#5-cloudflare-workers-cron-배포)
+6. [config.json 수정법](#6-configjson-수정법)
+7. [SRT vs KTX 차이점](#7-srt-vs-ktx-차이점)
 8. [알려진 한계](#8-알려진-한계)
 9. [주의사항](#9-주의사항)
 
@@ -91,7 +91,67 @@ DEBUG=1 python check_trains.py
 
 ---
 
-## 5. config.json 수정법
+## 5. Cloudflare Workers cron 배포
+
+GitHub Actions 내장 cron 대신 Cloudflare Workers가 5분마다 `workflow_dispatch`를 호출하는 구조입니다.
+
+```
+Cloudflare Workers cron (*/5 * * * *)
+  → POST /repos/.../actions/workflows/check.yml/dispatches
+    → GitHub Actions 실행 → python check_trains.py
+```
+
+### 사전 준비
+
+1. [Cloudflare 계정](https://dash.cloudflare.com) 생성 (무료 플랜 가능)
+2. GitHub Fine-grained PAT — `Actions: Read and Write` 권한 필요
+
+### 배포 절차
+
+```bash
+cd cf-worker
+
+# wrangler 설치
+npm install
+
+# Cloudflare 로그인
+npx wrangler login
+
+# GH_TOKEN secret 등록 (터미널에서 입력, 파일에 쓰지 말 것)
+npx wrangler secret put GH_TOKEN
+
+# 배포
+npm run deploy
+```
+
+### 확인
+
+```bash
+# 배포된 Worker 목록
+npx wrangler workers list
+
+# 로그 실시간 확인
+npx wrangler tail
+
+# 수동으로 cron 즉시 실행 (테스트)
+curl "https://api.cloudflare.com/client/v4/accounts/<ACCOUNT_ID>/workers/scripts/train-seat-cron/schedules" \
+  -H "Authorization: Bearer <CF_TOKEN>"
+```
+
+Cloudflare 대시보드 → Workers & Pages → `train-seat-cron` → Triggers 탭에서 cron 일정과 최근 실행 이력을 확인할 수 있습니다.
+
+### cron 간격 변경
+
+`cf-worker/wrangler.toml`의 `crons` 값을 수정한 뒤 `npm run deploy` 재실행:
+
+```toml
+[triggers]
+crons = ["*/3 * * * *"]   # 3분마다
+```
+
+---
+
+## 6. config.json 수정법
 
 `config.json`의 `targets` 배열만 수정하면 됩니다. **코드 변경 불필요.**
 
@@ -142,7 +202,7 @@ DEBUG=1 python check_trains.py
 
 ---
 
-## 6. SRT vs KTX 차이점
+## 7. SRT vs KTX 차이점
 
 | 항목 | SRT | KTX |
 |---|---|---|
@@ -150,15 +210,6 @@ DEBUG=1 python check_trains.py
 | 예약 사이트 | [etk.srail.kr](https://etk.srail.kr) | [letskorail.com](https://www.letskorail.com) |
 | 회원체계 | SRT 회원 (별도 가입) | 코레일 회원 |
 | 환경변수 | `SRT_ID`, `SRT_PASSWORD` | `KTX_ID`, `KTX_PASSWORD` |
-
----
-
-## 7. GitHub Actions cron 한계
-
-- **최소 실행 간격: 5분** (`*/5 * * * *`)
-- GitHub 서버 부하에 따라 최대 수 분 지연 가능 (즉각성 보장 안 됨)
-- **무료 플랜 제한**: public 레포는 무제한 / private 레포는 월 2,000분
-- Actions 탭 → **Run workflow** 버튼으로 수동 즉시 실행 가능
 
 ---
 

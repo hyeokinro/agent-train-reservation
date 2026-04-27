@@ -1,0 +1,14 @@
+name = "train-seat-cron"
+main = "src/worker.js"
+compatibility_date = "2025-01-01"
+
+[triggers]
+crons = ["*/5 * * * *"]
+
+[vars]
+GH_OWNER = "hyeokinro"
+GH_REPO = "agent-train-reservation"
+GH_WORKFLOW = "check.yml"
+
+# GH_TOKEN은 wrangler secret으로 등록 (이 파일에 직접 쓰지 말 것)
+# wrangler secret put GH_TOKEN
