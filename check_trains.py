@@ -142,16 +142,18 @@ def process_srt_targets(targets: list) -> None:
 
             print(f"[SRT] {label}: {t['dep']}→{t['arr']} {t['date']} {t['dep_time']} 조회 중...")
             trains = srt.search_train(t["dep"], t["arr"], t["date"], t["dep_time"])
-            print(f"[SRT] {label}: 열차 {len(trains)}개 발견")
+            print(f"[SRT] {label}: 좌석 있는 열차 {len(trains)}개 (매진 열차는 제외된 수치)")
 
             if t["train_no"]:
                 candidates = [x for x in trains if x.train_number == t["train_no"]]
+                if not candidates:
+                    print(f"[SRT] {label}: SRT {t['train_no']} 매진 — 좌석 대기 중")
+                    continue
             else:
                 candidates = trains
-
-            if not candidates:
-                print(f"[SRT] {label}: 대상 열차 좌석 없음")
-                continue
+                if not candidates:
+                    print(f"[SRT] {label}: 해당 시간 이후 좌석 있는 열차 없음 — 대기 중")
+                    continue
 
             first = candidates[0]
 
@@ -250,16 +252,18 @@ def process_ktx_targets(targets: list) -> None:
                 train_type=TrainType.KTX,
                 passengers=passengers_obj,
             )
-            print(f"[KTX] {label}: 열차 {len(trains)}개 발견")
+            print(f"[KTX] {label}: 좌석 있는 열차 {len(trains)}개 (매진 열차는 제외된 수치)")
 
             if t["train_no"]:
                 candidates = [x for x in trains if x.train_no == t["train_no"]]
+                if not candidates:
+                    print(f"[KTX] {label}: KTX {t['train_no']} 매진 — 좌석 대기 중")
+                    continue
             else:
                 candidates = trains
-
-            if not candidates:
-                print(f"[KTX] {label}: 대상 열차 좌석 없음")
-                continue
+                if not candidates:
+                    print(f"[KTX] {label}: 해당 시간 이후 좌석 있는 열차 없음 — 대기 중")
+                    continue
 
             first = candidates[0]
 
