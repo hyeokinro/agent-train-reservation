@@ -27,6 +27,21 @@ SRT_PAY_URL = "https://etk.srail.kr"
 KTX_PAY_URL = "https://www.letskorail.com"
 
 
+def safe_err(e: BaseException) -> str:
+    """일부 라이브러리(예: SRTNetFunnelError)는 __str__이 비정상적으로 동작해서
+    f-string에 그대로 넣으면 TypeError가 또 발생함. 안전하게 문자열화."""
+    try:
+        s = str(e)
+        if isinstance(s, str):
+            return s
+    except Exception:
+        pass
+    try:
+        return f"{type(e).__name__}: {e!r}"
+    except Exception:
+        return f"{type(e).__name__}: <unprintable>"
+
+
 def today_kst() -> str:
     return datetime.now(KST).strftime("%Y%m%d")
 
@@ -57,7 +72,7 @@ def notify(text: str) -> None:
         resp.raise_for_status()
         print(f"[텔레그램] 알림 전송 완료")
     except Exception as e:
-        print(f"[텔레그램 전송 실패] {e}", file=sys.stderr)
+        print(f"[텔레그램 전송 실패] {safe_err(e)}", file=sys.stderr)
 
 
 def format_success(target: dict, train_no_str: str, dep: str, arr: str,
@@ -139,14 +154,14 @@ def process_srt_targets(targets: list) -> None:
         srt = SRT(srt_id, srt_pw)
         print("[SRT] 로그인 성공")
     except Exception as e:
-        notify(f"⚠️ SRT 로그인 실패: {e}")
+        notify(f"⚠️ SRT 로그인 실패: {safe_err(e)}")
         return
 
     try:
         existing = srt.get_reservations()
         print(f"[SRT] 기존 예약 {len(existing)}건 확인")
     except Exception as e:
-        print(f"[SRT] 예약 내역 조회 실패 (무시하고 진행): {e}")
+        print(f"[SRT] 예약 내역 조회 실패 (무시하고 진행): {safe_err(e)}")
         existing = []
 
     for t in targets:
@@ -217,7 +232,7 @@ def process_srt_targets(targets: list) -> None:
                         pay_label="SRT 결제 바로가기",
                     ))
                 except Exception as e:
-                    print(f"[SRT] {label}: 예약 실패 - {e}")
+                    print(f"[SRT] {label}: 예약 실패 - {safe_err(e)}")
                     notify(format_fail(
                         t,
                         train_no_str=f"SRT {first.train_number}",
@@ -225,7 +240,7 @@ def process_srt_targets(targets: list) -> None:
                         arr=first.arr_station_name,
                         dep_t=format_time(first.dep_time),
                         arr_t=format_time(first.arr_time),
-                        error=str(e),
+                        error=safe_err(e),
                         pay_url=SRT_PAY_URL,
                         pay_label="SRT 예매 바로가기",
                     ))
@@ -246,7 +261,7 @@ def process_srt_targets(targets: list) -> None:
                     srt.reserve_standby_option_settings(standby_rsv, True, True)
                     print(f"[SRT] {label}: 대기 옵션 설정 완료 (SMS + 등급변경)")
                 except Exception as opt_e:
-                    print(f"[SRT] {label}: 대기 옵션 설정 실패 (무시): {opt_e}")
+                    print(f"[SRT] {label}: 대기 옵션 설정 실패 (무시): {safe_err(opt_e)}")
                 print(f"[SRT] {label}: 예약대기 신청 성공!")
                 notify(format_standby(
                     t,
@@ -259,7 +274,7 @@ def process_srt_targets(targets: list) -> None:
                     pay_label="SRT 예매 바로가기",
                 ))
             except Exception as e:
-                print(f"[SRT] {label}: 예약대기 실패 - {e}")
+                print(f"[SRT] {label}: 예약대기 실패 - {safe_err(e)}")
                 notify(format_fail(
                     t,
                     train_no_str=f"SRT {first.train_number}",
@@ -267,14 +282,14 @@ def process_srt_targets(targets: list) -> None:
                     arr=first.arr_station_name,
                     dep_t=format_time(first.dep_time),
                     arr_t=format_time(first.arr_time),
-                    error=f"예약대기 실패: {e}",
+                    error=f"예약대기 실패: {safe_err(e)}",
                     pay_url=SRT_PAY_URL,
                     pay_label="SRT 예매 바로가기",
                 ))
 
         except Exception as e:
-            print(f"[SRT] {label}: 처리 중 에러 - {e}")
-            notify(f"⚠️ SRT [{label}] 처리 중 에러: {e}")
+            print(f"[SRT] {label}: 처리 중 에러 - {safe_err(e)}")
+            notify(f"⚠️ SRT [{label}] 처리 중 에러: {safe_err(e)}")
 
 
 def process_ktx_targets(targets: list) -> None:
@@ -290,14 +305,14 @@ def process_ktx_targets(targets: list) -> None:
         korail = Korail(ktx_id, ktx_pw)
         print("[KTX] 로그인 성공")
     except Exception as e:
-        notify(f"⚠️ KTX 로그인 실패: {e}")
+        notify(f"⚠️ KTX 로그인 실패: {safe_err(e)}")
         return
 
     try:
         existing = korail.reservations()
         print(f"[KTX] 기존 예약 {len(existing)}건 확인")
     except Exception as e:
-        print(f"[KTX] 예약 내역 조회 실패 (무시하고 진행): {e}")
+        print(f"[KTX] 예약 내역 조회 실패 (무시하고 진행): {safe_err(e)}")
         existing = []
 
     for t in targets:
@@ -373,7 +388,7 @@ def process_ktx_targets(targets: list) -> None:
                         pay_label="코레일 결제 바로가기",
                     ))
                 except Exception as e:
-                    print(f"[KTX] {label}: 예약 실패 - {e}")
+                    print(f"[KTX] {label}: 예약 실패 - {safe_err(e)}")
                     notify(format_fail(
                         t,
                         train_no_str=f"KTX {first.train_no}",
@@ -381,7 +396,7 @@ def process_ktx_targets(targets: list) -> None:
                         arr=first.arr_name,
                         dep_t=format_time(first.dep_time),
                         arr_t=format_time(first.arr_time),
-                        error=str(e),
+                        error=safe_err(e),
                         pay_url=KTX_PAY_URL,
                         pay_label="코레일 예매 바로가기",
                     ))
@@ -408,7 +423,7 @@ def process_ktx_targets(targets: list) -> None:
                     pay_label="코레일 예매 바로가기",
                 ))
             except Exception as e:
-                print(f"[KTX] {label}: 예약대기 실패 - {e}")
+                print(f"[KTX] {label}: 예약대기 실패 - {safe_err(e)}")
                 notify(format_fail(
                     t,
                     train_no_str=f"KTX {first.train_no}",
@@ -416,14 +431,14 @@ def process_ktx_targets(targets: list) -> None:
                     arr=first.arr_name,
                     dep_t=format_time(first.dep_time),
                     arr_t=format_time(first.arr_time),
-                    error=f"예약대기 실패: {e}",
+                    error=f"예약대기 실패: {safe_err(e)}",
                     pay_url=KTX_PAY_URL,
                     pay_label="코레일 예매 바로가기",
                 ))
 
         except Exception as e:
-            print(f"[KTX] {label}: 처리 중 에러 - {e}")
-            notify(f"⚠️ KTX [{label}] 처리 중 에러: {e}")
+            print(f"[KTX] {label}: 처리 중 에러 - {safe_err(e)}")
+            notify(f"⚠️ KTX [{label}] 처리 중 에러: {safe_err(e)}")
 
 
 def main() -> None:
