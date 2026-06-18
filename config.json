@@ -22,10 +22,20 @@
     },
     {
       "type": "SRT",
-      "label": "6/21 SRT683 전주→수서",
+      "label": "6/21 SRT684 전주→수서",
       "date": "20260621",
       "dep": "전주",
       "arr": "수서",
+      "dep_time": "190000",
+      "train_no": "684",
+      "passengers": 1
+    },
+    {
+      "type": "SRT",
+      "label": "6/22 SRT683 수서→전주 (테스트)",
+      "date": "20260622",
+      "dep": "수서",
+      "arr": "전주",
       "dep_time": "190000",
       "train_no": "683",
       "passengers": 1

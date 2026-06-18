@@ -8,6 +8,7 @@ import requests
 try:
     from SRT import SRT
     from SRT.passenger import Adult
+    from SRT.seat_type import SeatType
     SRT_AVAILABLE = True
 except ImportError:
     SRT_AVAILABLE = False
@@ -25,6 +26,20 @@ WEEKDAYS = ["월", "화", "수", "목", "금", "토", "일"]
 
 SRT_PAY_URL = "https://etk.srail.kr"
 KTX_PAY_URL = "https://www.letskorail.com"
+
+SEAT_TYPE_MAP = {
+    "general_first": SeatType.GENERAL_FIRST,
+    "general_only": SeatType.GENERAL_ONLY,
+    "special_first": SeatType.SPECIAL_FIRST,
+    "special_only": SeatType.SPECIAL_ONLY,
+} if SRT_AVAILABLE else {}
+
+SEAT_TYPE_LABEL = {
+    "general_first": "일반실 우선",
+    "general_only": "일반실만",
+    "special_first": "특실 우선",
+    "special_only": "특실만",
+}
 
 
 def safe_err(e: BaseException) -> str:
@@ -202,6 +217,8 @@ def process_srt_targets(targets: list) -> None:
                 continue
 
             passengers = [Adult() for _ in range(t["passengers"])]
+            seat_type_key = t.get("seat_type", "general_first")
+            seat_type = SEAT_TYPE_MAP.get(seat_type_key, SeatType.GENERAL_FIRST)
 
             # 1) 좌석 있는 열차 우선 — 정상 예약
             seated = [x for x in candidates if x.seat_available()]
@@ -218,7 +235,7 @@ def process_srt_targets(targets: list) -> None:
 
                 print(f"[SRT] {label}: 열차 {first.train_number} 좌석 있음 → 예약 시도...")
                 try:
-                    srt.reserve(first, passengers=passengers)
+                    srt.reserve(first, passengers=passengers, special_seat=seat_type)
                     print(f"[SRT] {label}: 예약 성공!")
                     notify(format_success(
                         t,
@@ -255,7 +272,7 @@ def process_srt_targets(targets: list) -> None:
             first = standby_capable[0]
             print(f"[SRT] {label}: 열차 {first.train_number} 매진 → 예약대기 신청...")
             try:
-                standby_rsv = srt.reserve_standby(first, passengers=passengers)
+                standby_rsv = srt.reserve_standby(first, passengers=passengers, special_seat=seat_type)
                 # SMS 알림 + 좌석등급 변경 동의 설정 (실패해도 대기는 유지)
                 try:
                     srt.reserve_standby_option_settings(standby_rsv, True, True)

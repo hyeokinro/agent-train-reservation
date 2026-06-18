@@ -200,6 +200,15 @@ crons = ["*/3 * * * *"]   # 3분마다
 | `dep_time` | 출발 시각 이후로 조회 (HHMMSS) | `"190000"` |
 | `train_no` | 특정 열차번호. 빈 값이면 조건 맞는 첫 열차 | `"683"` 또는 `""` |
 | `passengers` | 탑승 인원 수 | `1` |
+| `seat_type` | 좌석 유형 (SRT 전용, 생략 시 `general_first`) | `"special_only"` |
+
+**`seat_type` 옵션 (SRT만 지원):**
+| 값 | 의미 |
+|---|---|
+| `general_first` | 일반실 우선 (기본값) |
+| `general_only` | 일반실만 |
+| `special_first` | 특실 우선 |
+| `special_only` | 특실만 |
 
 **변경 예시:**
 - 새 열차 추가: `targets` 배열에 항목 추가 후 commit & push
