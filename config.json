@@ -8,7 +8,8 @@
       "arr": "전주",
       "dep_time": "102000",
       "train_no": "681",
-      "passengers": 1
+      "passengers": 1,
+      "seat_type": "special_only"
     },
     {
       "type": "SRT",
