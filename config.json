@@ -2,10 +2,30 @@
   "targets": [
     {
       "type": "SRT",
-      "label": "서울→전주 장모님 귀가",
-      "date": "20260430",
+      "label": "6/20 SRT681 수서→전주",
+      "date": "20260620",
       "dep": "수서",
       "arr": "전주",
+      "dep_time": "102000",
+      "train_no": "681",
+      "passengers": 1
+    },
+    {
+      "type": "SRT",
+      "label": "6/21 SRT681 수서→전주",
+      "date": "20260621",
+      "dep": "수서",
+      "arr": "전주",
+      "dep_time": "102000",
+      "train_no": "681",
+      "passengers": 1
+    },
+    {
+      "type": "SRT",
+      "label": "6/21 SRT683 전주→수서",
+      "date": "20260621",
+      "dep": "전주",
+      "arr": "수서",
       "dep_time": "190000",
       "train_no": "683",
       "passengers": 1
