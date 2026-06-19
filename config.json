@@ -10,16 +10,6 @@
       "train_no": "681",
       "passengers": 1,
       "seat_type": "special_only"
-    },
-    {
-      "type": "SRT",
-      "label": "6/21 SRT684 전주→수서",
-      "date": "20260621",
-      "dep": "전주",
-      "arr": "수서",
-      "dep_time": "155500",
-      "train_no": "684",
-      "passengers": 1
     }
   ]
 }
