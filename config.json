@@ -1,3 +1,16 @@
 {
-  "targets": []
+  "targets": [
+    {
+      "type": "SRT",
+      "label": "7/17 SRT684 전주→수서",
+      "date": "20260717",
+      "dep": "전주",
+      "arr": "수서",
+      "dep_time": "155500",
+      "train_no": "684",
+      "passengers": 2,
+      "adults": 1,
+      "children": 1
+    }
+  ]
 }

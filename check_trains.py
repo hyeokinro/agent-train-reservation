@@ -7,7 +7,7 @@ import requests
 
 try:
     from SRT import SRT
-    from SRT.passenger import Adult
+    from SRT.passenger import Adult, Child
     from SRT.seat_type import SeatType
     SRT_AVAILABLE = True
 except ImportError:
@@ -216,7 +216,9 @@ def process_srt_targets(targets: list) -> None:
                 print(f"[DEBUG] 예약 건너뜀.")
                 continue
 
-            passengers = [Adult() for _ in range(t["passengers"])]
+            adults = t.get("adults", t["passengers"])
+            children = t.get("children", 0)
+            passengers = [Adult() for _ in range(adults)] + [Child() for _ in range(children)]
             seat_type_key = t.get("seat_type", "general_first")
             seat_type = SEAT_TYPE_MAP.get(seat_type_key, SeatType.GENERAL_FIRST)
 
