@@ -2,6 +2,18 @@
   "targets": [
     {
       "type": "SRT",
+      "label": "8/15 SRT681 수서→전주",
+      "date": "20260815",
+      "dep": "수서",
+      "arr": "전주",
+      "dep_time": "102000",
+      "train_no": "681",
+      "passengers": 2,
+      "adults": 1,
+      "children": 1
+    },
+    {
+      "type": "SRT",
       "label": "8/17 SRT684 전주→수서",
       "date": "20260817",
       "dep": "전주",
