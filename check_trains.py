@@ -7,8 +7,14 @@ import requests
 
 try:
     from SRT import SRT
-    from SRT.passenger import Adult, Child
+    from SRT.passenger import Adult, Child, Passenger
     from SRT.seat_type import SeatType
+
+    class Infant(Passenger):
+        def __init__(self, count=1):
+            super().__init__()
+            super().__init_internal__("유아", "6", count)
+
     SRT_AVAILABLE = True
 except ImportError:
     SRT_AVAILABLE = False
@@ -218,7 +224,8 @@ def process_srt_targets(targets: list) -> None:
 
             adults = t.get("adults", t["passengers"])
             children = t.get("children", 0)
-            passengers = [Adult() for _ in range(adults)] + [Child() for _ in range(children)]
+            infants = t.get("infants", 0)
+            passengers = [Adult() for _ in range(adults)] + [Child() for _ in range(children)] + [Infant() for _ in range(infants)]
             seat_type_key = t.get("seat_type", "general_first")
             seat_type = SEAT_TYPE_MAP.get(seat_type_key, SeatType.GENERAL_FIRST)
 
