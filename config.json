@@ -10,7 +10,8 @@
       "train_no": "684",
       "passengers": 2,
       "adults": 1,
-      "children": 1
+      "children": 1,
+      "seat_type": "special_only"
     }
   ]
 }
