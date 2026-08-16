@@ -2,39 +2,14 @@
   "targets": [
     {
       "type": "SRT",
-      "label": "8/15 SRT681 수서→전주",
-      "date": "20260815",
-      "dep": "수서",
-      "arr": "전주",
-      "dep_time": "102000",
-      "train_no": "681",
+      "label": "8/17 SRT682 전주→수서",
+      "date": "20260817",
+      "dep": "전주",
+      "arr": "수서",
+      "dep_time": "081000",
+      "train_no": "682",
       "passengers": 2,
       "adults": 2
-    },
-    {
-      "type": "SRT",
-      "label": "8/17 SRT684 전주→수서 (성인2)",
-      "date": "20260817",
-      "dep": "전주",
-      "arr": "수서",
-      "dep_time": "155500",
-      "train_no": "684",
-      "passengers": 2,
-      "adults": 2,
-      "seat_type": "special_only"
-    },
-    {
-      "type": "SRT",
-      "label": "8/17 SRT684 전주→수서 (성인1+어린이1)",
-      "date": "20260817",
-      "dep": "전주",
-      "arr": "수서",
-      "dep_time": "155500",
-      "train_no": "684",
-      "passengers": 2,
-      "adults": 1,
-      "children": 1,
-      "seat_type": "special_only"
     }
   ]
 }
