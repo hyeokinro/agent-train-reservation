@@ -225,7 +225,7 @@ def process_srt_targets(targets: list) -> None:
             adults = t.get("adults", t["passengers"])
             children = t.get("children", 0)
             infants = t.get("infants", 0)
-            passengers = [Adult() for _ in range(adults)] + [Child() for _ in range(children)] + [Infant() for _ in range(infants)]
+            passengers = [Adult() for _ in range(adults)] + [Child() for _ in range(children + infants)]
             seat_type_key = t.get("seat_type", "general_first")
             seat_type = SEAT_TYPE_MAP.get(seat_type_key, SeatType.GENERAL_FIRST)
 
