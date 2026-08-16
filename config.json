@@ -8,8 +8,9 @@
       "arr": "수서",
       "dep_time": "081000",
       "train_no": "682",
-      "passengers": 1,
-      "adults": 1
+      "passengers": 2,
+      "adults": 1,
+      "infants": 1
     }
   ]
 }
